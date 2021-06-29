@@ -14,13 +14,13 @@ var (
 
 type MessagesController struct {
 	*MessagesRepository
-	clients []*websocket.Conn
+	clients map[*websocket.Conn]bool
 }
 
 func NewMessagesController(messageRepository *MessagesRepository) *MessagesController {
 	return &MessagesController{
 		messageRepository,
-		make([]*websocket.Conn, 0),
+		make(map[*websocket.Conn]bool),
 	}
 }
 
@@ -45,7 +45,8 @@ func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	controller.clients = append(controller.clients, ws)
+
+	controller.clients[ws] = true
 	defer ws.Close()
 
 	for {
@@ -58,19 +59,13 @@ func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
 		messageData := message{"Username", time.Now(), string(msg)}
 		controller.MessagesRepository.Add(messageData)
 		// Write
-		for _, client := range controller.clients {
-			err = ws.WriteJSON(messageData)
+		for client := range controller.clients {
+			err = client.WriteJSON(messageData)
 			if err != nil {
 				c.Logger().Error(err)
 				client.Close()
-				//delete(controller.clients, client)
+				delete(controller.clients, client)
 			}
 		}
-
-		/*// Write
-		err = ws.WriteJSON(message{"Username", time.Now(), string(msg)})
-		if err != nil {
-			c.Logger().Error(err)
-		}*/
 	}
 }
