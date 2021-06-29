@@ -1,5 +1,9 @@
 package messages
 
+import "time"
+
 type message struct {
-	Text string
+	Username  string
+	Timestamp time.Time
+	Text      string
 }
