@@ -21,6 +21,11 @@ func (controller *MessagesController) GetAll(c echo.Context) error {
 
 func (controller *MessagesController) PostMessage(c echo.Context) error {
 	msg := c.FormValue("message")
+
+	if msg == "" {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid message content"}
+	}
+
 	controller.MessagesRepository.Add(message{msg})
-	return c.JSON(http.StatusOK, "some data")
+	return c.JSON(http.StatusCreated, msg)
 }

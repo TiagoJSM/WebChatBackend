@@ -28,12 +28,8 @@ func main() {
 
 	e := echo.New()
 	e.Renderer = t
-	e.GET("/", func(c echo.Context) error {
-		return messagesController.GetAll(c)
-	})
-	e.POST("/message", func(c echo.Context) error {
-		return messagesController.PostMessage(c)
-	})
+	e.GET("/", messagesController.GetAll)
+	e.POST("/message", messagesController.PostMessage)
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
