@@ -1,16 +1,21 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/TiagoJSM/WebChatBackend/messages"
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	messagesRepository := messages.NewMessagesRepository()
-	messagesController := messages.NewMessagesController(messagesRepository)
+	messagesRepository := messages.NewRepository()
+	messageService := messages.NewService(messagesRepository)
+	messagesController := messages.NewController(messageService)
 
 	e := echo.New()
 	e.Static("/static", "assets")
@@ -23,5 +28,20 @@ func main() {
 		port = "8080"
 	}
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
+	go func() {
+		if err := e.Start(fmt.Sprintf(":%s", port)); err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
+	// Use a buffered channel to avoid missing signals as recommended for signal.Notify
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	}
 }

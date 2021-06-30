@@ -7,3 +7,15 @@
 
 # Usage
 - In the web browser open {host}:8080
+
+# Tests
+- Run `make test`
+
+# Project Structure
+The project is divided in 3 layers
+
+The Web layer handled by controllers to process web requests.
+
+The Service layer that processes the business logic of the application.
+
+The Repository layer that provides an interface to the application data.

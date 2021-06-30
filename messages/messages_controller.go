@@ -2,7 +2,6 @@ package messages
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -13,19 +12,19 @@ var (
 )
 
 type MessagesController struct {
-	*MessagesRepository
+	*MessagesService
 	clients map[*websocket.Conn]bool
 }
 
-func NewMessagesController(messageRepository *MessagesRepository) *MessagesController {
+func NewController(messageService *MessagesService) *MessagesController {
 	return &MessagesController{
-		messageRepository,
+		messageService,
 		make(map[*websocket.Conn]bool),
 	}
 }
 
 func (controller *MessagesController) GetAll(c echo.Context) error {
-	messages := controller.MessagesRepository.GetAll()
+	messages := controller.MessagesService.GetAll()
 	return c.JSON(http.StatusOK, messages)
 }
 
@@ -65,8 +64,7 @@ func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
 			if len(msg.Text) == 0 {
 				continue
 			}
-			messageData := message{msg.Username, time.Now(), msg.Text}
-			controller.MessagesRepository.Add(messageData)
+			messageData := controller.MessagesService.Add(msg)
 			// Write
 			controller.sendMessageToClients(c, &messageData)
 		}

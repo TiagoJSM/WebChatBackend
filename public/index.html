@@ -24,9 +24,14 @@
             </div>
 
             <div id="signup">
-                <label>Name:</label>
-                <input type="text" id="username" />
-                <button id="signup-button">Enter</button>
+                <div>
+                    <label>Name:</label>
+                    <input type="text" id="username" pattern="[A-Za-z0-9]{1,20}"/>
+                    <button id="signup-button">Enter</button>
+                </div>
+                <div id="signup-validation" class="validation no-display">
+                    <p>Invalid username</p>
+                </div>
             </div>
         </main>
 
@@ -112,8 +117,16 @@
                 }
 
                 function signUp() {
-                    username = document.getElementById("username").value;
-                    getChatMessages();
+                    const usernameInput = document.getElementById("username");
+                    const signupValidation = document.getElementById("signup-validation");
+                    if(usernameInput.checkValidity())
+                    {
+                        username = usernameInput.value;
+                        getChatMessages();
+                    }
+                    else {
+                        signupValidation.classList.remove('no-display');
+                    }
                 }
 
                 function postMessage() {
