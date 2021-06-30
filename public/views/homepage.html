@@ -99,7 +99,8 @@
                 }
 
                 function postMessage() {
-                    const msg = document.getElementById("message-input").value;
+                    const messageText = document.getElementById("message-input").value;
+                    const msg = JSON.stringify({ username: username, text: messageText });
                     websocket.send(msg);
                 }
 

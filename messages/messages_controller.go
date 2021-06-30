@@ -50,13 +50,15 @@ func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
 	defer ws.Close()
 
 	for {
+		msg := messageModel{}
+
 		// Read
-		_, msg, err := ws.ReadMessage()
+		err := ws.ReadJSON(&msg)
 		if err != nil {
 			c.Logger().Error(err)
 		}
 
-		messageData := message{"Username", time.Now(), string(msg)}
+		messageData := message{msg.Username, time.Now(), msg.Text}
 		controller.MessagesRepository.Add(messageData)
 		// Write
 		for client := range controller.clients {
