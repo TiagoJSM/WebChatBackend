@@ -37,3 +37,7 @@ body > main > #messages > .messages-controls {
 .no-display {
   display: none;
 }
+
+.validation {
+  color: red;
+}

@@ -17,7 +17,7 @@ type MessagesController struct {
 	clients map[*websocket.Conn]bool
 }
 
-func NewMessagesController(messageRepository *MessagesRepository) *MessagesController {
+func NewController(messageRepository *MessagesRepository) *MessagesController {
 	return &MessagesController{
 		messageRepository,
 		make(map[*websocket.Conn]bool),

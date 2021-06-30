@@ -4,7 +4,7 @@ type MessagesRepository struct {
 	message []message
 }
 
-func NewMessagesRepository() *MessagesRepository {
+func NewRepository() *MessagesRepository {
 	return &MessagesRepository{
 		message: make([]message, 0),
 	}
