@@ -14,7 +14,8 @@ import (
 
 func main() {
 	messagesRepository := messages.NewRepository()
-	messagesController := messages.NewController(messagesRepository)
+	messageService := messages.NewService(messagesRepository)
+	messagesController := messages.NewController(messageService)
 
 	e := echo.New()
 	e.Static("/static", "assets")
