@@ -45,8 +45,10 @@
                 };
 
                 function appendMessage(message) {
-                    var textnode = document.createTextNode(`${message.Username} [${message.Timestamp}]: ${message.Text}`); 
-                    messages.appendChild(textnode);
+                    var messageNode = document.createElement('div');
+                    messageNode.classList.add("message-container");
+                    messageNode.innerText = `${message.Username} [${message.Timestamp}]: ${message.Text}`;
+                    messages.appendChild(messageNode);
                 }
 
                 function populateChatWindow(messages) {

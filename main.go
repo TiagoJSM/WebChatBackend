@@ -16,7 +16,6 @@ func main() {
 	e.Static("/static", "assets")
 	e.File("/", "public/index.html")
 	e.GET("/messages", messagesController.GetAll)
-	e.POST("/message", messagesController.PostMessage)
 	e.GET("/ws", messagesController.ConnectToSocket)
 
 	port := os.Getenv("PORT")

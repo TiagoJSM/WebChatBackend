@@ -29,17 +29,6 @@ func (controller *MessagesController) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, messages)
 }
 
-func (controller *MessagesController) PostMessage(c echo.Context) error {
-	msg := c.FormValue("message")
-
-	if msg == "" {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid message content"}
-	}
-
-	controller.MessagesRepository.Add(message{"Username", time.Now(), msg})
-	return c.JSON(http.StatusCreated, msg)
-}
-
 func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {

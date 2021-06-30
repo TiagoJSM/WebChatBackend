@@ -1,3 +1,7 @@
 body > #messages{
   visibility: hidden;
 }
+
+.message-container {
+  display: block;
+}
