@@ -7,3 +7,6 @@
 
 # Usage
 - In the web browser open {host}:8080
+
+# Tests
+- Run `make test`
