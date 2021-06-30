@@ -10,6 +10,11 @@
     <body>
         <main>
             <h1>WebChat</h1>
+
+            <div id="socket-connection-error" class="no-display">
+                <div>There was an error connecting to the chat, please refresh the page</div>
+            </div>
+
             <div id="messages" class="no-display">
                 <div id="messages-container"></div>
                 <div classname="messages-controls">
@@ -54,6 +59,13 @@
                     messages.appendChild(messageNode);
                 }
 
+                function appendTextInMessages(text) {
+                    var messageNode = document.createElement('div');
+                    messageNode.classList.add("message-container");
+                    messageNode.innerText = text;
+                    messages.appendChild(messageNode);
+                }
+
                 function populateChatWindow(messages) {
                     messages.forEach(appendMessage);
                 }
@@ -78,6 +90,10 @@
                         const msg = JSON.parse(event.data);
                         appendMessage(msg);
                     }
+
+                    websocket.onerror = function (evt) {
+                        document.getElementById('socket-connection-error').classList.remove('no-display');
+                    }
                 }
 
                 function sucessFetchingMessages(messages) {
@@ -88,7 +104,7 @@
                 }
 
                 function errorFetchingMessages(status, messages) {
-
+                    appendTextInMessages("Couldn't fetch previous messages at the moment");
                 }
 
                 function getChatMessages() {
@@ -97,12 +113,13 @@
 
                 function signUp() {
                     username = document.getElementById("username").value;
-
                     getChatMessages();
                 }
 
                 function postMessage() {
-                    const messageText = document.getElementById("message-input").value;
+                    const messageInput = document.getElementById("message-input");
+                    const messageText = messageInput.value;
+                    messageInput.value = '';
                     const msg = JSON.stringify({ username: username, text: messageText });
                     websocket.send(msg);
                 }

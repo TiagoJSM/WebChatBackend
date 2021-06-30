@@ -45,11 +45,15 @@ func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
 		err := ws.ReadJSON(&msg)
 		if err != nil {
 			c.Logger().Error(err)
+			// if user disconnected then stop the message handling
 			if closeError := err.(*websocket.CloseError); closeError != nil {
 				delete(controller.clients, ws)
 				return err
 			}
 		} else {
+			if len(msg.Text) == 0 {
+				continue
+			}
 			messageData := message{msg.Username, time.Now(), msg.Text}
 			controller.MessagesRepository.Add(messageData)
 			// Write
@@ -60,10 +64,6 @@ func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
 					client.Close()
 					delete(controller.clients, client)
 				}
-			}
-
-			if err != nil {
-				return err
 			}
 		}
 	}
