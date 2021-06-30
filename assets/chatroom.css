@@ -1,0 +1,39 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  margin: 8px;
+  flex: 1 0 auto;
+}
+
+body, main {
+  display: flex;
+  flex-direction: column;
+}
+
+body > main > #messages {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+body > main > #messages.no-display{
+  display: none;
+}
+
+body >main >  #messages > #messages-container {
+  flex-grow: 1;
+}
+
+body > main > #messages > .messages-controls {
+  display: block;
+}
+
+.no-display {
+  display: none;
+}

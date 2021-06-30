@@ -29,15 +29,15 @@ func (controller *MessagesController) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, messages)
 }
 
-func (controller *MessagesController) PostMessage(c echo.Context) error {
-	msg := c.FormValue("message")
-
-	if msg == "" {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid message content"}
+func (controller *MessagesController) sendMessageToClients(c echo.Context, messageData *message) {
+	for client := range controller.clients {
+		err := client.WriteJSON(messageData)
+		if err != nil {
+			c.Logger().Error(err)
+			client.Close()
+			delete(controller.clients, client)
+		}
 	}
-
-	controller.MessagesRepository.Add(message{"Username", time.Now(), msg})
-	return c.JSON(http.StatusCreated, msg)
 }
 
 func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
@@ -56,18 +56,19 @@ func (controller *MessagesController) ConnectToSocket(c echo.Context) error {
 		err := ws.ReadJSON(&msg)
 		if err != nil {
 			c.Logger().Error(err)
-		}
-
-		messageData := message{msg.Username, time.Now(), msg.Text}
-		controller.MessagesRepository.Add(messageData)
-		// Write
-		for client := range controller.clients {
-			err = client.WriteJSON(messageData)
-			if err != nil {
-				c.Logger().Error(err)
-				client.Close()
-				delete(controller.clients, client)
+			// if user disconnected then stop the message handling
+			if closeError := err.(*websocket.CloseError); closeError != nil {
+				delete(controller.clients, ws)
+				return err
 			}
+		} else {
+			if len(msg.Text) == 0 {
+				continue
+			}
+			messageData := message{msg.Username, time.Now(), msg.Text}
+			controller.MessagesRepository.Add(messageData)
+			// Write
+			controller.sendMessageToClients(c, &messageData)
 		}
 	}
 }
